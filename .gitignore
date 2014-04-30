@@ -1,3 +1,8 @@
 /build/
+.gradle/
 *.bak
 *~
+# it's common to ignore CVS dirs globally.
+# undo that here because it will prevent git from seeing this source
+# on case-insensitive file systems (i.e. Apple HFS)
+!CVS

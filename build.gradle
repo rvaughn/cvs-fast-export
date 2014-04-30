@@ -1,0 +1,42 @@
+apply plugin: 'scala'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.sf.proguard:proguard-gradle:4.11'
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.scala-lang:scala-library:2.9.3'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'org.rvaughn.scm.cvs.FastExport'
+    }
+}
+
+task bundle(type: proguard.gradle.ProGuardTask, dependsOn: jar) {
+    description 'Assembles a jar archive containing all required classes.'
+    group 'build'
+    ext.outputFile = file("${libsDir}/${project.name}-bundle.jar")
+    injars jar.archivePath
+    injars configurations.runtime.files, filter: '!META-INF/MANIFEST.MF'
+    outjars outputFile
+    configuration 'proguard.cfg'
+}
+
+artifacts {
+    archives file: bundle.outputFile, builtBy: bundle
+}
+
+wrapper {
+    gradleVersion = '1.12'
+}
