@@ -1,5 +1,0 @@
-#!/bin/zsh
-
-memflags=(-Xmx2048m -Xms512m)
-
-java $memflags $gcflags -jar ${0:h}/cvs-fast-export.jar $*

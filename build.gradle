@@ -1,4 +1,7 @@
 apply plugin: 'scala'
+apply plugin: 'application'
+
+mainClassName = 'org.rvaughn.scm.cvs.FastExport'
 
 buildscript {
     repositories {
@@ -19,22 +22,18 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'org.rvaughn.scm.cvs.FastExport'
+        attributes 'Main-Class': project.mainClassName
     }
 }
 
 task bundle(type: proguard.gradle.ProGuardTask, dependsOn: jar) {
-    description 'Assembles a jar archive containing all required classes.'
+    description 'Assembles a runnable jar archive containing all required classes.'
     group 'build'
     ext.outputFile = file("${libsDir}/${project.name}-bundle.jar")
     injars jar.archivePath
     injars configurations.runtime.files, filter: '!META-INF/MANIFEST.MF'
     outjars outputFile
     configuration 'proguard.cfg'
-}
-
-artifacts {
-    archives file: bundle.outputFile, builtBy: bundle
 }
 
 wrapper {
