@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Roger Vaughn
+ * Copyright (c) 2015 Roger Vaughn
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -64,11 +64,11 @@ package org.rvaughn.scm.cvs {
 
     def createExportFile: PrintStream = {
       if (Config.exportToFile && Config.gzip) {
-        new PrintStream(new GZIPOutputStream(new FileOutputStream(Config.filename)))
+        new UnixPrintStream(new GZIPOutputStream(new FileOutputStream(Config.filename)))
       } else if (Config.exportToFile) {
-        new PrintStream(new FileOutputStream(Config.filename))
+        new UnixPrintStream(new FileOutputStream(Config.filename))
       } else if (Config.gzip) {
-        new PrintStream(new GZIPOutputStream(System.out))
+        new UnixPrintStream(new GZIPOutputStream(System.out))
       } else {
         System.out
       }
@@ -122,7 +122,7 @@ package org.rvaughn.scm.cvs {
 
       val monitor = new Monitor(process.getInputStream).start
       val errMonitor = new Monitor(process.getErrorStream).start
-      val out = new PrintStream(process.getOutputStream)
+      val out = new UnixPrintStream(process.getOutputStream)
       try {
         exportToStream(model, out)
       } catch {
