@@ -51,7 +51,7 @@ package org.rvaughn.scm.cvs {
     }
 
     def quotedPath(path: String): String = {
-      path.replace("\"", "\\\"").replace("\n", "\\n")
+      path.replace("\\", "/").replace("\"", "\\\"").replace("\n", "\\n")
     }
   }
 
