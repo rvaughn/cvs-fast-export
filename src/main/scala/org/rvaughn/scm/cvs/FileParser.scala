@@ -320,7 +320,7 @@ package org.rvaughn.scm.cvs {
     def decode(lines: List[Array[Byte]]): List[String] = {
       var l = List[String]() // built backwards
       for (line <- lines) {
-        l ::= StringCache(new String(line, "windows-1252").stripLineEnd)
+        l ::= StringCache(new String(line, "utf-8").stripLineEnd)
       }
       l.reverse
     }
