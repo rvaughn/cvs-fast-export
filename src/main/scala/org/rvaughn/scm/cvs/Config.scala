@@ -48,6 +48,7 @@ package org.rvaughn.scm.cvs {
     var progress = false
     var logFile = ""
     var force = false
+    var excludePattern: Array[String] = Array.empty
 
     def importMarks = !marksImportFile.isEmpty
     def exportMarks = !marksExportFile.isEmpty
@@ -80,6 +81,6 @@ package org.rvaughn.scm.cvs {
     reqd("", "--log=FILE", "log conversion progress to FILE") { f: String => logFile = f }
     bool("", "--progress", "show detailed conversion progress") { progress = _ }
     flag("-q", "--quiet", "suppress normal progress output (overrides --progress)") { () => quiet = true }
+    reqd("", "--exclude=ANTPATTERN", "exclude files and folders matching this ant pattern") { s: String  => excludePattern = Config.excludePattern :+ s }
   }
-
 }

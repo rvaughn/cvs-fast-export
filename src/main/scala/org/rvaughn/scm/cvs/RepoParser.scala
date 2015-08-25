@@ -23,12 +23,14 @@
 import java.io.File
 import java.io.PrintStream
 import annotation.tailrec
+import org.apache.tools.ant.DirectoryScanner
 
 package org.rvaughn.scm.cvs {
 
-  class RepoParser(dir: String, log: PrintStream) {
+
+class RepoParser(dir: String, log: PrintStream) {
     val base = dir
-    val paths = scanpaths(new File(base)).sorted
+    val paths = scanPaths(new File(base)).sorted
     val repo = StringCache(findRepo(dir))
 
     // find out where the repository starts (if at all)
@@ -43,18 +45,24 @@ package org.rvaughn.scm.cvs {
       }
     }
 
-    def scanpaths(dir: File): List[String] = {
-      // tried to use a for comprehension, but couldn't get the types to work??
+    def scanPaths(dir: File): List[String] = {
+      val directoryScanner = new DirectoryScanner()
+      val includes = Array("**/*,v")
+      val excludes = Array("**/.directory_history,v") ++ Config.excludePattern
       var paths: List[String] = List()
-      // if we're in the Attic, then don't scan subdirs, because CVS doesn't
-      val normalDir = dir.getName != "Attic"
-      for (path <- dir.listFiles()) {
-        if (path.getName().endsWith(",v") && path.getName() != ".directory_history,v") {
-          paths ::= path.getPath
-        } else if (path.isDirectory() && normalDir) {
-          paths :::= scanpaths(path)
-        }
+
+      directoryScanner.setIncludes(includes)
+      directoryScanner.setExcludes(excludes)
+
+      directoryScanner.setBasedir(dir.getAbsolutePath)
+      directoryScanner.setCaseSensitive(false)
+
+      directoryScanner.scan
+
+      for(fileName <- directoryScanner.getIncludedFiles) {
+        paths ::= dir.getAbsolutePath + "/" + fileName
       }
+
       paths
     }
 

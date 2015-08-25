@@ -101,6 +101,7 @@ section for complete details.
         --log=FILE                   log conversion progress to FILE
         --[no-]progress              show detailed conversion progress
     -q, --quiet                      suppress normal progress output (overrides --progress)
+        --exclude=ANTPATTERN         exclude files and folders matching this ant pattern
     -h, --help                       Show this message
 
 Options
@@ -387,6 +388,15 @@ This option suppresses all console output. This overrides the
 information to file, but suppress it in the console.
 
 By default, cvs-fast-export will report conversion progress.
+
+
+#### --exclude=ANTPATTERN
+This option tells cvs-fast-export to exclude all files and folders
+matching the ANTPATTERN. This option can be used several times to
+exclude multiple patterns. 
+The pattern matcher is using the Apache Ant syntax. 
+See http://ant.apache.org/manual/dirtasks.html#patterns for more information.
+
 
 
 #### -h, --help
