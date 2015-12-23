@@ -37,6 +37,9 @@ package org.rvaughn.scm.cvs {
     val branchRE = """^(\d+(\.\d+)+)\.0\.(\d+)$""".r
     val tagRE = """^\d+(\.\d+)+$""".r
 
+    val commentEncoding = "utf-8"
+    val valueEncoding = "utf-8" // esp. file and author names
+
     val path = file.getPath
     val in = new BufferedRandomAccessFile(file)
     var next = 0
@@ -183,19 +186,22 @@ package org.rvaughn.scm.cvs {
       StringCache(b.toString)
     }
 
+    def bytesToString(b: ArrayBuffer[Byte], encoding: String): String = {
+      StringCache(new String(b.toArray, encoding))
+    }
+
     def value(): String = {
       // call string() if it's a string
-      val b = new StringBuilder
+      var b = new ArrayBuffer[Byte]
       while (';' != next) {
-        b.append(next.toChar)
+        b += next.toByte
         next = in.read
       }
-      // should be able to return None if no value
-      StringCache(b.toString)
+      bytesToString(b, valueEncoding)
     }
 
     def string(): String = {
-      val b = new StringBuilder
+      val b = new ArrayBuffer[Byte]
       // the first @ is already in next - consume it then move on
       next = in.read
       while (next != -1) {
@@ -205,13 +211,13 @@ package org.rvaughn.scm.cvs {
           next = in.read
           if ('@' != next) {
             ws
-            return StringCache(b.toString)
+            return bytesToString(b, valueEncoding)
           }
         }
-        b.append(next.toChar)
+        b += next.toByte
         next = in.read
       }
-      StringCache(b.toString)
+      bytesToString(b, valueEncoding)
     }
 
     def stringOrValue: String = if ('@' == next) string else value
@@ -320,7 +326,7 @@ package org.rvaughn.scm.cvs {
     def decode(lines: List[Array[Byte]]): List[String] = {
       var l = List[String]() // built backwards
       for (line <- lines) {
-        l ::= StringCache(new String(line, "utf-8").stripLineEnd)
+        l ::= StringCache(new String(line, commentEncoding).stripLineEnd)
       }
       l.reverse
     }
