@@ -29,8 +29,11 @@ package org.rvaughn.scm.cvs {
 
 
 class RepoParser(dir: String, log: PrintStream) {
+    // the directory containing the CVS archives to import
     val base = dir
+    // the complete list of CVS archive files to import, relative to "base"
     val paths = scanPaths(new File(base)).sorted
+    // optional: the directory containing the actual CVS repository root
     val repo = StringCache(findRepo(dir))
 
     // find out where the repository starts (if at all)
@@ -49,7 +52,6 @@ class RepoParser(dir: String, log: PrintStream) {
       val directoryScanner = new DirectoryScanner()
       val includes = Array("**/*,v")
       val excludes = Array("**/.directory_history,v") ++ Config.excludePattern
-      var paths: List[String] = List()
 
       directoryScanner.setIncludes(includes)
       directoryScanner.setExcludes(excludes)
@@ -59,16 +61,11 @@ class RepoParser(dir: String, log: PrintStream) {
 
       directoryScanner.scan
 
-      for(fileName <- directoryScanner.getIncludedFiles) {
-        paths ::= dir.getPath + "/" + fileName
-      }
-
-      paths
+      directoryScanner.getIncludedFiles.toList
     }
 
     def parse(path: String, f: (CvsFile) => Unit) {
-      val name = path.substring(base.length + 1, path.length - 2)
-      f(new FileParser(new File(path), log).getFile(base, name, repo))
+      f(new FileParser(new File(base, path), log).getFile(base, path.dropRight(2), repo))
     }
 
     def foreach(f: CvsFile => Unit) {
