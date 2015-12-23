@@ -60,7 +60,7 @@ class RepoParser(dir: String, log: PrintStream) {
       directoryScanner.scan
 
       for(fileName <- directoryScanner.getIncludedFiles) {
-        paths ::= dir.getAbsolutePath + "/" + fileName
+        paths ::= dir.getPath + "/" + fileName
       }
 
       paths
