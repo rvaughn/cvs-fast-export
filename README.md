@@ -134,7 +134,7 @@ Defaults to `unix`.
 #### -a, --authors=FILE
 
 Translate CVS committer names to Git authors/committers.  FILE must be
-a Java properties file containing one author mapping per line in the
+a Java properties file encoded in Western(ISO 8859-1) containing one author mapping per line in the
 format:
 
     lowercased CVS name = Git name <email addr>
