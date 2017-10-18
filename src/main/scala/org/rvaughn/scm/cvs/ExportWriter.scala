@@ -30,7 +30,11 @@ package org.rvaughn.scm.cvs {
     var bytesExported = 0l
 
     def export(tag: Tag, out: PrintStream) {
-      out.println("reset refs/tags/" + tag.name)
+      if (tag.isBranchTag) {
+        out.println("reset refs/heads/" + tag.name)
+      } else {
+        out.println("reset refs/tags/" + tag.name)
+      }
       out.println("from :" + markForTag(tag))
       out.println
     }

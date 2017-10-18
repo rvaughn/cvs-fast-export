@@ -257,10 +257,13 @@ package org.rvaughn.scm.cvs {
       // find the first commit on this branch
       val branchCommits = commits.values.filter(c => c.branch == branch.name)
       if (branchCommits.size == 0) {
-        warn("branch " + branch.name + " has no commits")
+        // the branch was created but never committed to
         // this also means that all recorded roots must be real roots and not adds
-        // TODO: we need a time for it
-        // these will NOT get exported to Git, since there are no commits to record
+        // we create a special-case tag to hold these so that they get exported properly
+        val branchTag = new Tag(branch.name)
+        branchTag.isBranchTag = true
+        branchTag.revisions = branch.roots
+        tags += (branchTag.name -> branchTag)
       } else {
         val firstCommit = branchCommits.minBy(_.time)
 

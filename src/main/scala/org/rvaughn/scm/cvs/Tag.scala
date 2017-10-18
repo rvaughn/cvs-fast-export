@@ -27,6 +27,9 @@ package org.rvaughn.scm.cvs {
     var revisions = Set[Revision]()
     var commit: Commit = null
 
+    // branch tags are a special case to denote branches that were created but never committed to
+    var isBranchTag = false
+
     override def toString = {
       val b = new StringBuilder
       b.append("tag:    ").append(name).append("\n")

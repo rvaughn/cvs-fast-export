@@ -35,7 +35,7 @@ package org.rvaughn.scm.cvs {
     def fileCount = files.size
     def commitCount = commits.size
     def syntheticCommitCount = commits.count { (p) => p._2.synthetic }
-    def tagCount = tags.size
+    def tagCount = tags.values.count { (t) => !t.isBranchTag }
     def branchCount = branches.size
     def revisionCount = files.foldLeft(0) { (n, p) => n + p._2.revisions.size }
 
