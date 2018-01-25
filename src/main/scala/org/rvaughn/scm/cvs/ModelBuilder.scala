@@ -341,6 +341,18 @@ package org.rvaughn.scm.cvs {
         // partitioning is complete, so save 'em off
         branch.roots = roots
         branch.adds = adds
+
+        // ensure that all branch adds have corresponding branch commits. if they don't, synthesize
+        // commits for them. this is somewhat like the second "branch tag" case.
+        val missingRevs = branch.adds.filterNot(r => branchCommits.exists(c => c.containsDescendant(r)))
+        if (missingRevs.size > 0) {
+          for (r <- missingRevs) {
+            warn("file " + r.path + " is never committed to branch " + branch.name)
+          }
+          warn("synthesizing commit to resolve")
+          val missingRevsByCommit = missingRevs.groupBy(r => commits(r.commitid))
+          missingRevsByCommit.foreach(p => synthesizeBranchRevCommit(p._1, p._2, branch.name))
+        }
       }
 
       if (branch.roots.size == 0) {
@@ -355,7 +367,26 @@ package org.rvaughn.scm.cvs {
 
     // create a phony commit to fold foreign revisions into the branch
     def synthesizeBranchTagCommit(origCommit: Commit, revs: Set[Revision], branch: String) {
-      val newCommit = new Commit("branch-tag-fixup--" + origCommit.id)
+      val newCommit = new Commit("branch-tag-fixup--" + branch + "--" + origCommit.id)
+      newCommit.synthetic = true
+      newCommit.author = origCommit.author
+      newCommit.comment = origCommit.comment
+      newCommit.isTagFixup = false // it's not a fixup because we're not resetting the branch
+      newCommit.time = origCommit.time
+      newCommit.branch = branch
+      newCommit.isBranchStart = false
+      newCommit.revisions = revs
+
+      // record the commit
+      commits += (newCommit.id -> newCommit)
+
+      // note that the revisions are not duplicated and do not have their
+      // commitIds updated - this may cause problems later.
+    }
+
+    // create a phony commit to properly import a trunk revision into a branch
+    def synthesizeBranchRevCommit(origCommit: Commit, revs: Set[Revision], branch: String) {
+      val newCommit = new Commit("branch-rev-import--" + branch + "--" + origCommit.id)
       newCommit.synthetic = true
       newCommit.author = origCommit.author
       newCommit.comment = origCommit.comment

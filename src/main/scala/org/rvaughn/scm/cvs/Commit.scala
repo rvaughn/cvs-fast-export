@@ -84,6 +84,14 @@ package org.rvaughn.scm.cvs {
       parent != null
     }
 
+    def contains(rev: Revision): Boolean = {
+      revisions.contains(rev)
+    }
+
+    def containsDescendant(rev: Revision): Boolean = {
+      revisions.exists(r => r.isDescendantOf(rev))
+    }
+
     override def toString = {
       val b = new StringBuilder
       b.append("commit:  ").append(id).append("\n")
